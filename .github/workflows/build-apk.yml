@@ -1,0 +1,78 @@
+name: Build CloneMaster APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Extract CloneMaster ZIP
+      run: |
+        unzip -o CloneMaster_Final.zip
+        echo "✅ ZIP extracted successfully"
+        ls -la CloneMaster/
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Cache Gradle
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('CloneMaster/**/*.gradle*', 'CloneMaster/**/gradle-wrapper.properties') }}
+        restore-keys: ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x CloneMaster/gradlew
+
+    - name: Build Debug APK
+      working-directory: CloneMaster
+      run: ./gradlew assembleDebug --stacktrace
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CloneMaster-Debug-APK
+        path: CloneMaster/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+
+    - name: Create GitHub Release
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: CloneMaster v${{ github.run_number }}
+        body: |
+          ## CloneMaster APK — True 2nd Account
+
+          ### Features
+          - ✅ True 2nd account via Android Work Profile
+          - ✅ WhatsApp, Instagram, Facebook — 2 accounts on 1 phone
+          - ✅ PIN + Biometric security
+          - ✅ Privacy Locker
+          - ✅ No root required
+
+          ### How to install
+          1. Download APK below
+          2. Enable "Unknown Sources" on your phone
+          3. Install → Open → Tap "Create Work Profile"
+          4. Add any app → 2nd account ready!
+
+        files: CloneMaster/app/build/outputs/apk/debug/app-debug.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
