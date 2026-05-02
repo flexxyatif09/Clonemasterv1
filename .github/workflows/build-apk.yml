@@ -16,7 +16,7 @@ jobs:
     - name: Extract CloneMaster ZIP
       run: |
         unzip -o CloneMaster_Final.zip
-        echo "✅ ZIP extracted successfully"
+        echo "✅ ZIP extracted"
         ls -la CloneMaster/
 
     - name: Set up JDK 17
@@ -28,21 +28,14 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Cache Gradle
-      uses: actions/cache@v3
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('CloneMaster/**/*.gradle*', 'CloneMaster/**/gradle-wrapper.properties') }}
-        restore-keys: ${{ runner.os }}-gradle-
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x CloneMaster/gradlew
+        gradle-version: '8.5'
 
     - name: Build Debug APK
       working-directory: CloneMaster
-      run: ./gradlew assembleDebug --stacktrace
+      run: gradle assembleDebug --stacktrace
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
