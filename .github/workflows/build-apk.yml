@@ -28,14 +28,13 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.5'
+    - name: Make gradlew executable
+      working-directory: CloneMaster
+      run: chmod +x gradlew
 
     - name: Build Debug APK
       working-directory: CloneMaster
-      run: gradle assembleDebug --stacktrace
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
@@ -51,11 +50,16 @@ jobs:
         tag_name: v${{ github.run_number }}
         name: CloneMaster v${{ github.run_number }}
         body: |
-          ## CloneMaster APK — True 2nd Account
+          ## CloneMaster APK — Fixes Applied
+
+          ### Bug Fixes in this build
+          - ✅ Deploy New Clone crash fix — app ab crash nahi hoga
+          - ✅ Apps list blank screen fix — WhatsApp, Instagram sab dikhenge
+          - ✅ ANR fix — app freeze nahi hoga
+          - ✅ FOREGROUND_SERVICE permission add ki
 
           ### Features
-          - ✅ True 2nd account via Android Work Profile
-          - ✅ WhatsApp, Instagram, Facebook — 2 accounts on 1 phone
+          - ✅ Virtual Dual Account
           - ✅ PIN + Biometric security
           - ✅ Privacy Locker
           - ✅ No root required
@@ -63,8 +67,7 @@ jobs:
           ### How to install
           1. Download APK below
           2. Enable "Unknown Sources" on your phone
-          3. Install → Open → Tap "Create Work Profile"
-          4. Add any app → 2nd account ready!
+          3. Install → Open → Clone karo!
 
         files: CloneMaster/app/build/outputs/apk/debug/app-debug.apk
       env:
