@@ -28,9 +28,14 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Make gradlew executable
+    - name: Fix Gradle Wrapper JAR
       working-directory: CloneMaster
-      run: chmod +x gradlew
+      run: |
+        chmod +x gradlew
+        mkdir -p gradle/wrapper
+        curl -L -o gradle/wrapper/gradle-wrapper.jar \
+          "https://github.com/gradle/gradle/raw/v8.5.0/gradle/wrapper/gradle-wrapper.jar"
+        echo "✅ gradle-wrapper.jar size: $(wc -c < gradle/wrapper/gradle-wrapper.jar) bytes"
 
     - name: Build Debug APK
       working-directory: CloneMaster
@@ -52,17 +57,11 @@ jobs:
         body: |
           ## CloneMaster APK — Fixes Applied
 
-          ### Bug Fixes in this build
-          - ✅ Deploy New Clone crash fix — app ab crash nahi hoga
-          - ✅ Apps list blank screen fix — WhatsApp, Instagram sab dikhenge
-          - ✅ ANR fix — app freeze nahi hoga
-          - ✅ FOREGROUND_SERVICE permission add ki
-
-          ### Features
-          - ✅ Virtual Dual Account
-          - ✅ PIN + Biometric security
-          - ✅ Privacy Locker
-          - ✅ No root required
+          ### Bug Fixes
+          - ✅ Deploy New Clone crash fix
+          - ✅ Apps list blank screen fix
+          - ✅ ANR fix
+          - ✅ FOREGROUND_SERVICE permission
 
           ### How to install
           1. Download APK below
